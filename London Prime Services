@@ -1,0 +1,487 @@
+# Building a polished "London Prime Services" demo website package
+# Files: index.html, services.html, about.html, contact.html, style.css, script.js, README.txt
+# Use external image URLs (Unsplash) so no local image files required.
+import os, zipfile, textwrap, json
+base_dir = "/mnt/data/london_prime_services_site"
+os.makedirs(base_dir, exist_ok=True)
+
+index_html = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>London Prime Services — Your trusted service partner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <h1>London Prime Services</h1>
+        <p class="tag">Trusted home & business services across London</p>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="btn small">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <h2>London's #1 Choice for Professional Home & Business Services</h2>
+          <p>From plumbing and electrical to tutoring and IT support — quick, vetted professionals at your door.</p>
+          <div class="cta">
+            <a href="services.html" class="btn primary">Find Services</a>
+            <a href="contact.html" class="btn">Become a Provider</a>
+          </div>
+          <ul class="stats">
+            <li><strong>1,200+</strong><span>Jobs completed</span></li>
+            <li><strong>450+</strong><span>Trusted providers</span></li>
+            <li><strong>10+</strong><span>Years combined experience</span></li>
+          </ul>
+        </div>
+        <div class="hero-image">
+          <img src="https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=60" alt="London services">
+        </div>
+      </div>
+    </section>
+
+    <section class="services-preview">
+      <div class="container">
+        <h3>Popular categories</h3>
+        <div class="cards">
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1581579188386-3b8ecf8c2f4c?auto=format&fit=crop&w=600&q=60" alt="">
+            <h4>Plumbing & Repairs</h4>
+            <p>Fast emergency fixes, installations and maintenance.</p>
+          </div>
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1542736667-069246bdbc75?auto=format&fit=crop&w=600&q=60" alt="">
+            <h4>Electrical Work</h4>
+            <p>Qualified electricians for homes and offices.</p>
+          </div>
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=600&q=60" alt="">
+            <h4>Home Cleaning</h4>
+            <p>Trusted cleaners for one-off or regular sessions.</p>
+          </div>
+          <div class="card">
+            <img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=600&q=60" alt="">
+            <h4>IT Support</h4>
+            <p>Setup, troubleshooting and networking for businesses.</p>
+          </div>
+        </div>
+        <div class="more">
+          <a href="services.html" class="btn">See all services</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="providers">
+      <div class="container">
+        <h3>Featured providers</h3>
+        <div class="provider-grid">
+          <div class="provider">
+            <img src="https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?auto=format&fit=crop&w=400&q=60" alt="">
+            <h4>Bright Plumbing</h4>
+            <p>Camden • £30/hr • ⭐ 4.6</p>
+            <p class="muted">Emergency repairs, pipe work, bathroom installs.</p>
+            <button class="btn primary" data-id="p1">Book Now</button>
+          </div>
+          <div class="provider">
+            <img src="https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?auto=format&fit=crop&w=400&q=60" alt="">
+            <h4>Ace Electric</h4>
+            <p>Canary Wharf • £35/hr • ⭐ 4.7</p>
+            <p class="muted">Electrical installs, PAT testing, rewiring.</p>
+            <button class="btn primary" data-id="p2">Book Now</button>
+          </div>
+          <div class="provider">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=60" alt="">
+            <h4>Spark Cleaners</h4>
+            <p>Kensington • £22/hr • ⭐ 4.5</p>
+            <p class="muted">Domestic and commercial cleaning services.</p>
+            <button class="btn primary" data-id="p3">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="testimonials">
+      <div class="container">
+        <h3>What clients say</h3>
+        <div class="test-grid">
+          <blockquote>"Arrived on time and fixed our leak within 2 hours — highly recommend!"<cite>— James R., Chelsea</cite></blockquote>
+          <blockquote>"Our office IT setup went smoothly thanks to London Prime Services."<cite>— Aisha K., Canary Wharf</cite></blockquote>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <h4>London Prime Services</h4>
+        <p>221B Baker Street, London • contact@londonprimeservices.com • +44 20 7946 0123</p>
+      </div>
+      <div class="small">Demo site • For portfolio/proof only</div>
+    </div>
+  </footer>
+
+  <!-- Booking modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button id="closeModal" class="close">×</button>
+      <h2 id="modalTitle">Book Service</h2>
+      <div id="providerSummary"></div>
+      <form id="bookingForm">
+        <label>Your name <input type="text" id="clientName" required></label>
+        <label>Date & time <input type="datetime-local" id="slot" required></label>
+        <label>Notes <textarea id="notes"></textarea></label>
+        <div class="actions">
+          <button class="btn primary" type="submit">Confirm booking</button>
+          <button class="btn" type="button" id="cancelBooking">Cancel</button>
+        </div>
+      </form>
+      <div id="bookingResult" class="hidden"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+"""
+
+services_html = """<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Services — London Prime Services</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <h1>London Prime Services</h1>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="btn small">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>All Services</h2>
+    <p class="lead">We offer a wide range of vetted services across London.</p>
+
+    <section class="service-list">
+      <article class="service-item">
+        <h3>Plumbing & Repairs</h3>
+        <p>Emergency plumbing, installations, bathroom refits and maintenance.</p>
+      </article>
+      <article class="service-item">
+        <h3>Electrical Work</h3>
+        <p>Qualified electricians for domestic and commercial jobs.</p>
+      </article>
+      <article class="service-item">
+        <h3>Home Cleaning</h3>
+        <p>Regular and one-off cleaning services tailored to your home.</p>
+      </article>
+      <article class="service-item">
+        <h3>Gardening & Landscaping</h3>
+        <p>Garden maintenance, design, and seasonal clean-ups.</p>
+      </article>
+      <article class="service-item">
+        <h3>Moving & Packing</h3>
+        <p>House and office moves with packing services and transport.</p>
+      </article>
+      <article class="service-item">
+        <h3>IT Support</h3>
+        <p>Network setup, troubleshooting and device support for small businesses.</p>
+      </article>
+      <article class="service-item">
+        <h3>Painting & Decorating</h3>
+        <p>Interior and exterior painting by experienced decorators.</p>
+      </article>
+      <article class="service-item">
+        <h3>Appliance Installation</h3>
+        <p>Installations for ovens, washers, dryers and more.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <h4>London Prime Services</h4>
+        <p>221B Baker Street, London • contact@londonprimeservices.com</p>
+      </div>
+      <div class="small">Demo site • For portfolio/proof only</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+"""
+
+about_html = """<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>About — London Prime Services</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand"><h1>London Prime Services</h1></div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="btn small">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>About Us</h2>
+    <p>With over 10 years of combined experience, London Prime Services is dedicated to providing trusted, reliable home and business services across London. Our professionals are vetted and insured, ensuring quality and peace of mind for every job.</p>
+
+    <h3>Recent jobs</h3>
+    <ul>
+      <li><strong>Job #1023</strong> — Plumbing emergency in Camden (May 4, 2025)</li>
+      <li><strong>Job #1018</strong> — Office IT setup in Canary Wharf (Apr 21, 2025)</li>
+      <li><strong>Job #1012</strong> — Garden makeover in Kensington (Mar 18, 2025)</li>
+    </ul>
+
+    <h3>Our values</h3>
+    <p>Fast responses • Skilled professionals • Transparent pricing • Local to London</p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><h4>London Prime Services</h4><p>221B Baker Street, London • contact@londonprimeservices.com</p></div>
+      <div class="small">Demo site • For portfolio/proof only</div>
+    </div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
+"""
+
+contact_html = """<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Contact — London Prime Services</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand"><h1>London Prime Services</h1></div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html" class="btn small">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container contact-page">
+    <h2>Contact Us</h2>
+    <p>Have a job? Send us a message and we'll get back within 24 hours.</p>
+
+    <form id="contactForm">
+      <label>Name <input type="text" id="cname" required></label>
+      <label>Email <input type="email" id="cemail" required></label>
+      <label>Message <textarea id="cmessage" required></textarea></label>
+      <button class="btn primary" type="submit">Send Message</button>
+    </form>
+
+    <div class="contact-info">
+      <p><strong>Address:</strong> 221B Baker Street, London</p>
+      <p><strong>Email:</strong> contact@londonprimeservices.com</p>
+      <p><strong>Phone:</strong> +44 20 7946 0123</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><h4>London Prime Services</h4><p>221B Baker Street, London</p></div>
+      <div class="small">Demo site • For portfolio/proof only</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+"""
+
+style_css = """/* Simple clean stylesheet - mobile-first */
+:root{
+  --bg:#f5f7fb;--card:#fff;--accent:#0b75ff;--muted:#6b7280;--radius:12px;--shadow: 0 8px 22px rgba(20,20,40,0.06);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#0b1730;min-height:100vh;display:flex;flex-direction:column}
+.container{max-width:1100px;margin:0 auto;padding:18px}
+.header-inner{display:flex;justify-content:space-between;align-items:center}
+.site-header{background:white;box-shadow:var(--shadow);position:sticky;top:0;z-index:40}
+.brand h1{margin:6px 0 0;font-size:18px}
+.brand .tag{font-size:12px;color:var(--muted)}
+.nav a{margin-left:12px;text-decoration:none;color:var(--muted)}
+.nav .btn.small{background:var(--accent);color:white;padding:8px 10px;border-radius:8px}
+.hero{background:linear-gradient(180deg,rgba(11,117,255,0.06),transparent);padding:28px 0}
+.hero-inner{display:flex;gap:20px;align-items:center;flex-direction:column-reverse}
+.hero-text h2{margin:0;font-size:22px}
+.hero-text p{color:var(--muted);margin-top:8px}
+.cta{margin-top:12px;display:flex;gap:10px}
+.btn{padding:10px 14px;border-radius:10px;border:0;cursor:pointer}
+.btn.primary{background:var(--accent);color:white;font-weight:600}
+.btn{background:white;border:1px solid #e7eefc}
+.stats{display:flex;gap:16px;margin-top:14px;list-style:none;padding:0}
+.stats li{font-size:13px}
+.hero-image img{width:100%;border-radius:12px;box-shadow:var(--shadow)}
+.services-preview{padding:18px 0}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.card{background:var(--card);padding:10px;border-radius:12px;box-shadow:var(--shadow)}
+.card img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+.provider-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+.provider{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center}
+.provider img{width:86px;height:86px;border-radius:8px;object-fit:cover}
+.test-grid{display:grid;gap:8px;grid-template-columns:1fr}
+.site-footer{background:white;padding:16px 0;margin-top:18px;box-shadow:var(--shadow)}
+.lead{color:var(--muted)}
+.muted{color:var(--muted);font-size:13px}
+.service-list{display:grid;gap:12px}
+.service-item{background:var(--card);padding:12px;border-radius:10px;box-shadow:var(--shadow)}
+.contact-page{max-width:700px;margin:0 auto;padding:18px}
+.contact-info{margin-top:18px;color:var(--muted)}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,10,20,0.36);z-index:100}
+.modal.hidden{display:none}
+.modal-content{width:94%;max-width:520px;background:white;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(10,10,30,0.18)}
+.close{float:right;border:0;background:transparent;font-size:22px;cursor:pointer}
+.modal-content label{display:block;margin:8px 0;font-size:13px}
+.modal-content input[type="text"], .modal-content input[type="datetime-local"], .modal-content textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+.hidden{display:none}
+
+@media(min-width:780px){
+  .hero-inner{flex-direction:row}
+  .cards{grid-template-columns:repeat(4,1fr)}
+  .provider-grid{grid-template-columns:repeat(3,1fr)}
+  .test-grid{grid-template-columns:repeat(2,1fr)}
+}
+"""
+
+script_js = """// Simple client-side demo logic - no backend
+const providers = [
+  {id:'p1',name:'Bright Plumbing',location:'Camden',price:'£30/hr',rating:4.6},
+  {id:'p2',name:'Ace Electric',location:'Canary Wharf',price:'£35/hr',rating:4.7},
+  {id:'p3',name:'Spark Cleaners',location:'Kensington',price:'£22/hr',rating:4.5},
+];
+
+const modal = document.getElementById('modal');
+const providerSummary = document.getElementById('providerSummary');
+const bookingForm = document.getElementById('bookingForm');
+const bookingResult = document.getElementById('bookingResult');
+const closeModal = document.getElementById('closeModal');
+const cancelBooking = document.getElementById('cancelBooking');
+
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-id]');
+  if(btn){
+    const id = btn.dataset.id;
+    openBooking(id);
+  }
+});
+
+function openBooking(id){
+  const p = providers.find(x=>x.id===id);
+  if(!p) return;
+  providerSummary.innerHTML = `<strong>${p.name}</strong><p>${p.location} • ${p.price} • ⭐ ${p.rating}</p>`;
+  bookingResult.classList.add('hidden');
+  bookingForm.classList.remove('hidden');
+  document.getElementById('clientName').value='';
+  document.getElementById('slot').value='';
+  document.getElementById('notes').value='';
+  modal.classList.remove('hidden');
+}
+
+function closeBookingModal(){ modal.classList.add('hidden'); }
+if(closeModal) closeModal.addEventListener('click', closeBookingModal);
+if(cancelBooking) cancelBooking.addEventListener('click', closeBookingModal);
+
+if(bookingForm){
+  bookingForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('clientName').value.trim();
+    const slot = document.getElementById('slot').value;
+    if(!name || !slot){ alert('Please enter name and date/time'); return; }
+    bookingResult.classList.remove('hidden');
+    bookingResult.innerHTML = `<p>Booking confirmed for <strong>${name}</strong> on <strong>${new Date(slot).toLocaleString()}</strong>. (Demo)</p>`;
+    bookingForm.classList.add('hidden');
+    setTimeout(()=> closeBookingModal(), 1200);
+  });
+}
+
+// Contact form demo
+const contactForm = document.getElementById('contactForm');
+if(contactForm){
+  contactForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('cname').value.trim();
+    const email = document.getElementById('cemail').value.trim();
+    alert('Thanks ' + name + '! Your message has been received (demo).');
+    contactForm.reset();
+  });
+}
+"""
+
+readme = """London Prime Services — Demo website
+====================================
+
+Files included:
+- index.html
+- services.html
+- about.html
+- contact.html
+- style.css
+- script.js
+- README.txt
+
+How to deploy on Glitch:
+1. Go to https://glitch.com and log in.
+2. New Project -> Import from GitHub (if you push to a repo) OR New Project -> 'Hello Webpage'.
+3. Replace the default files with the ones in this package.
+4. Open 'Share' -> Live Site to get a public link.
+
+How to deploy on Netlify:
+1. Create a new site from Git -> choose your GitHub repo (or drag & drop ZIP in Netlify dashboard).
+2. Netlify will publish and give you a site URL like 'your-site.netlify.app'.
+
+Notes:
+- Images use Unsplash URLs so no local image upload is required.
+- This demo is client-side only and intended as a convincing portfolio/proof. For production, add backend, auth, payment integration, and security.
+"""
+
+files = {
+    "index.html": index_html,
+    "services.html": services_html,
+    "about.html": about_html,
+    "contact.html": contact_html,
+    "style.css": style_css,
+    "script.js": script_js,
+    "README.txt": readme
+}
+
+for fname, content in files.items():
+    with open(os.path.join(base_dir, fname), "w", encoding="utf-8") as f:
+        f.write(content)
+
+zip_path = "/mnt/data/london_prime_services_site.zip"
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    for fname in files:
+        z.write(os.path.join(base_dir, fname), arcname=fname)
+
+{"zip_path": zip_path, "files": list(files.keys())}
